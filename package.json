@@ -19,7 +19,8 @@
     "files": [
         "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
         "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
-        "src/**/*.{ts,tsx}"
+        "src/**/*.{ts,tsx}",
+        "schema/*.json"
     ],
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -58,7 +59,8 @@
     "dependencies": {
         "@jupyterlab/application": "^4.0.0",
         "@jupyterlab/coreutils": "^6.0.0",
-        "@jupyterlab/services": "^7.0.0"
+        "@jupyterlab/services": "^7.0.0",
+        "toc": "^0.4.0"
     },
     "devDependencies": {
         "@jupyterlab/builder": "^4.0.0",
@@ -98,17 +100,18 @@
     },
     "jupyterlab": {
         "discovery": {
-        "server": {
-            "managers": [
-                "pip"
-            ],
-            "base": {
-                "name": "html_toc_export"
+            "server": {
+                "managers": [
+                    "pip"
+                ],
+                "base": {
+                    "name": "html_toc_export"
+                }
             }
-        }
         },
         "extension": true,
-        "outputDir": "html_toc_export/labextension"
+        "outputDir": "html_toc_export/labextension",
+        "schemaDir": "schema"
     },
     "eslintIgnore": [
         "node_modules",
