@@ -1,0 +1,27 @@
+{
+    "title": "Export HTML w/ ToC",
+    "description": "Export HTML w/ ToC",
+    "jupyter.lab.menus": {
+      "main": [
+        {
+          "id": "jp-mainmenu-file",
+          "items": [
+            {
+              "type": "submenu",
+              "submenu": {
+                "id": "Export w/ table of contents",
+                "items": [
+                  {
+                    "command": "toc:export",
+                    "rank": 11
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "additionalProperties": false,
+    "type": "object"
+  }
