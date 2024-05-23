@@ -21,7 +21,7 @@ import { IMainMenu } from '@jupyterlab/mainmenu';
 import { Menu } from '@lumino/widgets';
 
 /**
- * Initialization data for the myextension extension.
+ * Initialization data for the extension.
  */
 const plugin: JupyterFrontEndPlugin<void> = {
   id: 'html-toc-export:plugin',
@@ -35,14 +35,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
     mainMenu: IMainMenu,
   ) => {
     console.log('Export ToC is activated!');
-
-    let exportTo: Menu = mainMenu.fileMenu.items.find(
-      item =>
-        item.type === 'submenu' &&
-        item.submenu!.id === 'jp-mainmenu-file-notebookexport'
-    )!.submenu!;
-    
-
     const command: string = 'toc:export';
     app.commands.addCommand( command, {
       label: 'Export HTML w/ ToC',
@@ -88,7 +80,13 @@ const plugin: JupyterFrontEndPlugin<void> = {
         }
       }
     });
-    exportTo.addItem({ command});
+
+    let exportTo: Menu = mainMenu.fileMenu.items.find(
+      item =>
+        item.type === 'submenu' &&
+        item.submenu!.id === 'jp-mainmenu-file-notebookexport'
+    )!.submenu!;
+    exportTo.addItem({ command });
   }
 };
 
