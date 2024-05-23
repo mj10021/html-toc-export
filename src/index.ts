@@ -18,8 +18,9 @@ import { PageConfig } from '@jupyterlab/coreutils';
 
 import { ServerConnection } from '@jupyterlab/services';
 
+import { IMainMenu } from '@jupyterlab/mainmenu';
 
-
+import { Menu } from '@lumino/widgets'
 
 /**
  * Initialization data for the myextension extension.
@@ -28,22 +29,30 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'html-toc-export:plugin',
   description: 'A JupyterLab extension.',
   autoStart: true,
-  requires: [ICommandPalette, INotebookTracker, ITableOfContentsTracker],
+  requires: [ICommandPalette, INotebookTracker, ITableOfContentsTracker, IMainMenu],
   activate: (
     app: JupyterFrontEnd,
     palette: ICommandPalette,
     tracker: INotebookTracker,
     toc: ITableOfContentsTracker,
+    mainMenu: IMainMenu,
   ) => {
     console.log('JupyterLab extension myextension is activated!');
     console.log('ICommandPalette:', palette);
 
 
+    let exportTo: Menu = mainMenu.fileMenu.items.find(
+      item =>
+        item.type === 'submenu' &&
+        item.submenu!.id === 'jp-mainmenu-file-notebookexport'
+    )!.submenu!;
+    
+
     const command: string = 'toc:export';
     app.commands.addCommand( command, {
       label: 'Export HTML w/ ToC',
       execute: () => {
-        let current = getCurrent(tracker, app.shell);
+        let current = getCurrentPanel(tracker, app.shell);
         getHTML(current.context.path)
           .then((response) => {
             let toc_model = toc.get(current)!;
@@ -61,7 +70,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
           });
       }
     });
-    palette.addItem({ command, category: 'Tutorial'});
+    exportTo.addItem({ command});
   }
 };
 
@@ -132,7 +141,7 @@ function downloadHtmlDocument(htmlDocument: Document, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-function getCurrent(
+function getCurrentPanel(
   tracker: INotebookTracker,
   shell: JupyterFrontEnd.IShell,
 ): NotebookPanel {
