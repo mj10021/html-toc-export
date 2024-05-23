@@ -12,15 +12,13 @@ import {
   TableOfContents
 } from '@jupyterlab/toc';
 
-import { ICommandPalette } from '@jupyterlab/apputils';
-
 import { PageConfig } from '@jupyterlab/coreutils';
 
 import { ServerConnection } from '@jupyterlab/services';
 
 import { IMainMenu } from '@jupyterlab/mainmenu';
 
-import { Menu } from '@lumino/widgets'
+import { Menu } from '@lumino/widgets';
 
 /**
  * Initialization data for the myextension extension.
@@ -29,17 +27,14 @@ const plugin: JupyterFrontEndPlugin<void> = {
   id: 'html-toc-export:plugin',
   description: 'A JupyterLab extension.',
   autoStart: true,
-  requires: [ICommandPalette, INotebookTracker, ITableOfContentsTracker, IMainMenu],
+  requires: [INotebookTracker, ITableOfContentsTracker, IMainMenu],
   activate: (
     app: JupyterFrontEnd,
-    palette: ICommandPalette,
     tracker: INotebookTracker,
     toc: ITableOfContentsTracker,
     mainMenu: IMainMenu,
   ) => {
-    console.log('JupyterLab extension myextension is activated!');
-    console.log('ICommandPalette:', palette);
-
+    console.log('Export ToC is activated!');
 
     let exportTo: Menu = mainMenu.fileMenu.items.find(
       item =>
@@ -53,7 +48,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
       label: 'Export HTML w/ ToC',
       execute: () => {
         let current = getCurrentPanel(tracker, app.shell);
-        getHTML(current.context.path)
+        // Save the doc here to be consistent with "Save and Export Notebook As:"
+        const context = current.context;
+        if (context.model.dirty && !context.model.readOnly) {
+          context.save().then(() => 
+          getHTML(current.context.path)
           .then((response) => {
             let toc_model = toc.get(current)!;
             let domParser = new DOMParser();
@@ -67,7 +66,26 @@ const plugin: JupyterFrontEndPlugin<void> = {
             doc.head.appendChild(css_node);
             downloadHtmlDocument(doc, "test.html");
             
+            })
+          );
+        }
+        else {
+          getHTML(current.context.path)
+            .then((response) => {
+              let toc_model = toc.get(current)!;
+              let domParser = new DOMParser();
+              let doc = domParser.parseFromString(response, "text/html");
+              let toc_html = doc.createElement("div");
+              toc_html.innerHTML = generateToCHTML(toc_model);
+              doc.body.prepend(toc_html);
+
+              let css_node = doc.createElement("style");
+              css_node.innerHTML = toc_css;
+              doc.head.appendChild(css_node);
+              downloadHtmlDocument(doc, "test.html");
+          
           });
+        }
       }
     });
     exportTo.addItem({ command});
@@ -361,22 +379,4 @@ or colors can be selected in the nbextensions_configurator
   }
 `
 
-
-// async function getCSS(): Promise<string>{
-//   const settings = ServerConnection.makeSettings();
-//   let response: Response;
-//   let baseUrl = PageConfig.getBaseUrl();
-//   let url = URLExt.join(baseUrl, "html-toc-export", "toc-css");
-//   try {
-//     response = await ServerConnection.makeRequest(url, {}, settings);
-//   } catch (error) {
-//     throw new ServerConnection.NetworkError(error as any);
-//   }
-//   let data: any = await response.text();
-//   if (!response.ok) {
-//     throw new ServerConnection.ResponseError(response, data.message || data);
-//   }
-//   return data
-// }
-// 
 export default plugin;
