@@ -20,6 +20,8 @@ import { IMainMenu } from '@jupyterlab/mainmenu';
 
 import { Menu } from '@lumino/widgets';
 
+import * as path from 'path';
+
 // CSS for export file
 const toc_css = `
 /*
@@ -334,6 +336,9 @@ const plugin: JupyterFrontEndPlugin<void> = {
         let current = getCurrentPanel(tracker, app.shell);
         // Save the doc here to be consistent with "Save and Export Notebook As:"
         const context = current.context;
+        let filename = path.basename(context.path, path.extname(context.path));
+        filename += ".html";
+
         if (context.model.dirty && !context.model.readOnly) {
           context.save().then(() => 
           getHTML(current.context.path)
@@ -348,7 +353,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
             let css_node = doc.createElement("style");
             css_node.innerHTML = toc_css;
             doc.head.appendChild(css_node);
-            downloadHtmlDocument(doc, "test.html");
+            downloadHtmlDocument(doc, filename);
             
             })
           );
@@ -366,7 +371,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
               let css_node = doc.createElement("style");
               css_node.innerHTML = toc_css;
               doc.head.appendChild(css_node);
-              downloadHtmlDocument(doc, "test.html");
+              downloadHtmlDocument(doc, filename);
           
           });
         }
