@@ -225,7 +225,7 @@ function generateToCHTML(model: TableOfContents.IModel<TableOfContents.IHeading>
           }
 
           if (heading.level === level) {
-              html += `<li class="toc-item"><span><h${level}>${heading.text}</h${level}></span>`;
+              html += `<li class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput toc-item"><span><h${level}>${heading.text}</h${level}></span>`;
 
               // Find and process subheadings
               const subHeadingsStart = index + 1;
@@ -234,7 +234,7 @@ function generateToCHTML(model: TableOfContents.IModel<TableOfContents.IHeading>
               const subHeadings = headings.slice(subHeadingsStart, subHeadingsEnd);
 
               if (subHeadings.length > 0) {
-                  html += `<ul class="toc-sublist toc-level-${level + 1}">${processHeadings(subHeadings, level + 1)}</ul>`;
+                  html += `<ul class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput toc-sublist toc-level-${level + 1}">${processHeadings(subHeadings, level + 1)}</ul>`;
               }
 
               html += `</li>`;
